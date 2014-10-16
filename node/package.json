@@ -1,0 +1,31 @@
+{
+  "name": "stats_node",
+  "version": "0.0.1",
+  "description": "stats_node",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nathanfaucett/stats_node.git"
+  },
+  "main": "src/index.js",
+  "keywords": [
+    "stats_node",
+    "stats_node.js"
+  ],
+  "author": "Nathan Faucett",
+  "license": "BSD-2-Clause",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt": "",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-jsbeautifier": ""
+  },
+  "dependencies": {
+    "layers": "nathanfaucett/layers",
+    "context": "nathanfaucett/context",
+    "cors": "nathanfaucett/cors",
+    "body_parser": "nathanfaucett/body_parser",
+    "type": "nathanfaucett/type",
+    "each": "nathanfaucett/each",
+    "utils": "nathanfaucett/utils"
+  }
+}

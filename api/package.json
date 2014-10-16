@@ -1,0 +1,27 @@
+{
+  "name": "stats_api",
+  "version": "0.0.1",
+  "description": "stats_api",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nathanfaucett/stats_api.git"
+  },
+  "main": "src/index.js",
+  "keywords": [
+    "stats_api",
+    "stats_api.js"
+  ],
+  "author": "Nathan Faucett",
+  "license": "BSD-2-Clause",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt": "",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-jsbeautifier": ""
+  },
+  "dependencies": {
+    "type": "nathanfaucett/type",
+    "each": "nathanfaucett/each",
+    "utils": "nathanfaucett/utils"
+  }
+}

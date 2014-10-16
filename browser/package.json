@@ -1,0 +1,29 @@
+{
+  "name": "stats_browser",
+  "version": "0.0.1",
+  "description": "stats_browser",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nathanfaucett/stats_browser.git"
+  },
+  "main": "src/index.js",
+  "keywords": [
+    "stats_browser",
+    "stats_browser.js"
+  ],
+  "author": "Nathan Faucett",
+  "license": "BSD-2-Clause",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt": "",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-jsbeautifier": ""
+  },
+  "dependencies": {
+    "each": "nathanfaucett/each",
+    "request": "nathanfaucett/request",
+    "time": "nathanfaucett/time",
+    "type": "nathanfaucett/type",
+    "utils": "nathanfaucett/utils"
+  }
+}
