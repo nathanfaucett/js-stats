@@ -1,4 +1,4 @@
-async
+stats node
 =======
 
-async methods for the browser and node.js
+stats for node.js

@@ -1,15 +1,15 @@
 var layers = require("layers"),
-    
+
     Cors = require("cors"),
-	BodyParser = require("body_parser");
+    BodyParser = require("body_parser");
 
 
 var router = new layers.Router();
 
 
 router.use(
-	new Cors(),
-	new BodyParser()
+    new Cors(),
+    new BodyParser()
 );
 
 

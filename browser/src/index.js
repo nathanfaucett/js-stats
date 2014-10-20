@@ -16,7 +16,7 @@ var NativeXMLHttpRequest = global.XMLHttpRequest || function XMLHttpRequest() {
             }
         }
     },
-    
+
     NATIVE_EVENT_TARGET = type.isNative(NativeXMLHttpRequest.prototype.addEventListener),
     TRIM_REGEX = /^[\s\xA0]+|[\s\xA0]+$/g,
     triggerEvent;
@@ -44,6 +44,14 @@ function trim(str) {
     return str.replace(TRIM_REGEX, "");
 }
 
+function capitalize(str) {
+    return str ? trim(str[0].toUpperCase() + str.slice(1).toLowerCase()) : str;
+}
+
+function toHeaderString(str) {
+    return each.map((str || "").split("-"), capitalize).join("-");
+}
+
 function parseResponseHeaders(responseHeaders) {
     var headers = {},
         raw = responseHeaders.split("\n");
@@ -54,6 +62,7 @@ function parseResponseHeaders(responseHeaders) {
             value = tmp[1];
 
         if (key && value) {
+            key = toHeaderString(key);
             value = trim(value);
 
             if (key === "Content-Length") {
@@ -71,14 +80,18 @@ function XMLHttpRequest() {
     var xhr = new NativeXMLHttpRequest(),
         data = {
             requestId: uuid()
-        };
-    
+        },
+        started = false;
+
     function onreadystatechange() {
         var statusCode = +xhr.status,
             readyState = +xhr.readyState;
-        
+
         if (readyState === 1) {
-            data.start = time.stamp();
+            if (started === false) {
+                data.start = time.stamp();
+                started = true;
+            }
         } else if (readyState === 4) {
             if (!NATIVE_EVENT_TARGET) {
                 if ((statusCode > 199 && statusCode < 301) || statusCode === 304) {
@@ -87,20 +100,21 @@ function XMLHttpRequest() {
                     triggerEvent(xhr, "error", xhr);
                 }
             }
-            
+
             data.statusCode = statusCode;
             data.url = xhr.responseURL;
 
             data.responseHeaders = type.isFunction(xhr.getAllResponseHeaders) ? parseResponseHeaders(xhr.getAllResponseHeaders()) : {};
             data.requestHeaders = utils.copy((type.isObject(xhr.__requestHeaders__) ? xhr.__requestHeaders__ : {}));
+            data.userAgent = navigator.userAgent;
 
             data.end = time.stamp();
             data.delta = data.end - data.start;
-            
+
             request.post("http://localhost:3000/requests", data);
         }
     }
-    
+
     if (NATIVE_EVENT_TARGET) {
         xhr.addEventListener("readystatechange", onreadystatechange);
     } else {
@@ -117,24 +131,24 @@ if (!NATIVE_EVENT_TARGET) {
             i = -1,
             length = eventList.length - 1,
             event;
-        
+
         while (i++ < length) event.call(xhr, data);
     }
-    
+
     NativeXMLHttpRequest.prototype.addEventListener = function(name, fn) {
         var _this = this,
             events = this.__events__ || (this.__events__ = {}),
             eventList = events[name] || (events[name] = []);
-        
+
         eventList.push(fn);
     };
-    
+
     NativeXMLHttpRequest.prototype.removeEventListener = function(name, fn) {
         var _this = this,
             events = this.__events__ || (this.__events__ = {}),
             eventList = events[name] || (events[name] = []),
             index = utils.indexOf(eventList, fn);
-        
+
         if (index !== -1) {
             eventList.splice(index, 1);
         }
@@ -147,7 +161,7 @@ NativeXMLHttpRequest.prototype.nativeSetRequestHeader = NativeXMLHttpRequest.pro
 NativeXMLHttpRequest.prototype.setRequestHeader = function setRequestHeader(key, value) {
 
     (this.__requestHeaders__ || (this.__requestHeaders__ = {}))[key] = value;
-    
+
     return this.nativeSetRequestHeader(key, value);
 };
 

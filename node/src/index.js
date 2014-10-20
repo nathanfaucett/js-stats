@@ -1,8 +1,22 @@
-var config = require("./config"),
+var api = require("./api"),
+    config = require("./config"),
     server = require("./server");
 
 
 require("./requests");
 
 
-server.listen(config.port, config.host);
+api.init(function(err) {
+    if (err) {
+        console.log(err);
+        return;
+    }
+
+    server.listen(config.port, config.host);
+});
+
+
+process.on("exit", function() {
+
+    api.close();
+})

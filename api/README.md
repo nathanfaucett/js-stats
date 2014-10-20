@@ -1,4 +1,4 @@
-async
+stats api
 =======
 
-async methods for the browser and node.js
+stats api for node.js

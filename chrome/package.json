@@ -1,15 +1,15 @@
 {
-  "name": "stats_api",
+  "name": "stats_chrome",
   "version": "0.0.1",
-  "description": "stats_api",
+  "description": "stats_chrome",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nathanfaucett/stats_api.git"
+    "url": "https://github.com/nathanfaucett/stats_chrome.git"
   },
   "main": "src/index.js",
   "keywords": [
-    "stats_api",
-    "stats_api.js"
+    "stats_chrome",
+    "stats_chrome.js"
   ],
   "author": "Nathan Faucett",
   "license": "BSD-2-Clause",
@@ -17,11 +17,13 @@
   "devDependencies": {
     "grunt": "",
     "grunt-contrib-jshint": "^0.10.0",
-    "grunt-jsbeautifier": ""
+    "grunt-jsbeautifier": "",
+    "grunt-require.js": "",
+    "grunt-contrib-less": "^0.11.4",
+    "grunt-contrib-watch": "^0.6.1"
   },
   "dependencies": {
     "each": "nathanfaucett/each",
-    "mongodb": "^1.4.19",
     "type": "nathanfaucett/type",
     "utils": "nathanfaucett/utils"
   }
