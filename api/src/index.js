@@ -1,27 +1,26 @@
-var MongoClient = require("mongodb").MongoClient,
+var collection = require("./collection"),
     config = require("./config");
 
 
 var api = module.exports;
 
 
-api.requests = require("./requests");
+api.models = require("./models/index");
 
 
 api.init = function(callback) {
-    MongoClient.connect("mongodb://127.0.0.1:" + config.mongodb.port + "/" + config.mongodb.database, function(err, mongodb) {
+    collection.init(function(err) {
         if (err) {
-            callback(err);
+            console.log(err);
             return;
         }
-
-        api.mongodb = mongodb;
 
         callback();
     });
 };
 
 api.close = function() {
-
-    api.mongodb.close();
+    if (collection) {
+        //collection.close();
+    }
 };

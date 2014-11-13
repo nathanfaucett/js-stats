@@ -1,0 +1,43 @@
+{
+  "name": "stats_app",
+  "version": "0.0.1",
+  "description": "polymer app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nathanfaucett/stats_app.git"
+  },
+  "main": "src/index.js",
+  "keywords": [
+    "stats_app",
+    "stats_app.js"
+  ],
+  "author": "Nathan Faucett",
+  "license": "BSD-2-Clause",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "ejs": "nathanfaucett/ejs",
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-htmlmin": "^0.3.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-less": "^0.11.4",
+    "grunt-contrib-uglify": "^0.6.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-jsbeautifier": "",
+    "grunt-require.js": "^0.2.22",
+    "grunt-vulcanize": "^0.5.0"
+  },
+  "dependencies": {
+    "cookies": "nathanfaucett/cookies",
+    "each": "nathanfaucett/each",
+    "template": "nathanfaucett/template",
+    "jquery": "^2.1.1",
+    "promise": "nathanfaucett/promise",
+    "request": "nathanfaucett/request",
+    "layers_browser": "nathanfaucett/layers_browser",
+    "page": "nathanfaucett/page",
+    "type": "nathanfaucett/type",
+    "utils": "nathanfaucett/utils"
+  }
+}

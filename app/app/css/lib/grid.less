@@ -1,0 +1,46 @@
+@grid_spaces: 12;
+
+
+.clearfix() {
+  *zoom:1;
+  &:before, &:after{
+    content:"";
+    display:table;
+	}
+  &:after {
+    clear:both;
+  }
+}
+
+.block {
+  .clearfix();
+  position: relative;
+  display: block;
+}
+
+.loop (@index) when (@index > 0) {
+  .block .grid-@{index} {
+		position: relative;
+    margin: 0;
+    width: ((@index / @grid_spaces * 99.999) + 0%);
+    float: left;
+
+    @media (max-width: 768px) {
+      width: 99.999%;
+      float: none;
+    }
+  }
+  
+	.block .push-@{index} {
+		margin-left: ((@index / @grid_spaces * 99.999) + 0%) * 1% !important;;
+  }
+  
+	.block .pull-@{index}{
+		margin-left: ((@index / @grid_spaces * 99.999) + 0%) * -1% !important;;
+  }
+
+  .loop(@index - 1);
+}
+
+.loop(0){}
+.loop(@grid_spaces);

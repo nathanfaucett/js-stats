@@ -20,8 +20,10 @@
     "grunt-jsbeautifier": ""
   },
   "dependencies": {
+    "bcrypt": "^0.8.0",
+    "orm": "nathanfaucett/orm",
+    "mongodb_adapter": "nathanfaucett/mongodb_adapter",
     "each": "nathanfaucett/each",
-    "mongodb": "^1.4.19",
     "type": "nathanfaucett/type",
     "utils": "nathanfaucett/utils"
   }

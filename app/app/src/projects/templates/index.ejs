@@ -1,0 +1,17 @@
+
+<div class="wrap">
+
+  <h1><%= i18n("projects.header") %></h1>
+
+
+  <% if (projects.length) { %>
+    <ul>
+      <% each(projects, function(project) { %>
+        <li><%= project.title %></li>
+      <% }); %>
+    </ul>
+  <% } else { %>
+    <p>asdfasdf asdf</p>
+  <% } %>
+
+</div>

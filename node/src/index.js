@@ -1,9 +1,10 @@
 var api = require("./api"),
     config = require("./config"),
+    router = require("./router"),
     server = require("./server");
 
 
-require("./requests");
+require("./routes/index");
 
 
 api.init(function(err) {
@@ -19,4 +20,4 @@ api.init(function(err) {
 process.on("exit", function() {
 
     api.close();
-})
+});

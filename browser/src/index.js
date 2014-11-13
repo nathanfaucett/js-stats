@@ -5,47 +5,77 @@ var utils = require("utils"),
     request = require("request");
 
 
-var NativeXMLHttpRequest = global.XMLHttpRequest || function XMLHttpRequest() {
-        try {
-            return new ActiveXObject("Msxml2.XMLHTTP.6.0");
-        } catch (e1) {
-            try {
-                return new ActiveXObject("Msxml2.XMLHTTP.3.0");
-            } catch (e2) {
-                throw new Error("XMLHttpRequest is not supported");
-            }
-        }
-    },
-
-    NATIVE_EVENT_TARGET = type.isNative(NativeXMLHttpRequest.prototype.addEventListener),
-    TRIM_REGEX = /^[\s\xA0]+|[\s\xA0]+$/g,
-    triggerEvent;
-
-
-request.defaults.XMLHttpRequest = NativeXMLHttpRequest;
 request.defaults.headers["Content-Type"] = "application/json";
 
 
-function uuid() {
-    return uuid.str.replace(uuid.re, uuid.replace);
-}
+var stats = module.exports,
 
-uuid.str = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
-uuid.re = /[xy]/g;
-uuid.replace = function(c) {
-    var r = Math.random() * 16 | 0,
-        v = c === "x" ? r : r & 0x3 | 0x8;
+    NativeXMLHttpRequest = (
+        global.XMLHttpRequest ||
+        function XMLHttpRequest() {
+            var xhr;
 
-    return v.toString(16);
+            try {
+                xhr = new ActiveXObject("Msxml2.XMLHTTP.6.0");
+            } catch (e1) {
+                try {
+                    xhr = new ActiveXObject("Msxml2.XMLHTTP.3.0");
+                } catch (e2) {
+                    throw new Error("XMLHttpRequest is not supported");
+                }
+            }
+
+            xhr.setRequestHeader = function setRequestHeader(key, value) {
+
+                (xhr.__requestHeaders__ || (xhr.__requestHeaders__ = {}))[key] = value;
+            };
+
+            xhr.addEventListener = function addEventListener(name, fn) {
+                var events = xhr.__events__ || (xhr.__events__ = {}),
+                    eventList = events[name] || (events[name] = []);
+
+                if (type.isFunction(fn)) {
+                    eventList.push(fn);
+                }
+            };
+
+            xhr.removeEventListener = function removeEventListener(name, fn) {
+                var events = xhr.__events__ || (xhr.__events__ = {}),
+                    eventList = events[name] || (events[name] = []),
+                    index = utils.indexOf(eventList, fn);
+
+                if (index !== -1) {
+                    eventList.splice(index, 1);
+                }
+            };
+
+            xhr.dispatchEvent = function dispatchEvent(name, data) {
+                var events = xhr.__events__ || (xhr.__events__ = {}),
+                    eventList = events[name] || (events[name] = []),
+                    i = -1,
+                    length = eventList.length - 1,
+                    event;
+
+                while (i++ < length) event.call(xhr, data);
+            };
+
+            return xhr;
+        }
+    ),
+    supportsEventListener = type.isNative(NativeXMLHttpRequest.prototype.addEventListener);
+
+
+NativeXMLHttpRequest.prototype.nativeSetRequestHeader = NativeXMLHttpRequest.prototype.setRequestHeader;
+NativeXMLHttpRequest.prototype.setRequestHeader = function setRequestHeader(key, value) {
+
+    (this.__requestHeaders__ || (this.__requestHeaders__ = {}))[key] = value;
+
+    return this.nativeSetRequestHeader(key, value);
 };
 
-function trim(str) {
-
-    return str.replace(TRIM_REGEX, "");
-}
 
 function capitalize(str) {
-    return str ? trim(str[0].toUpperCase() + str.slice(1).toLowerCase()) : str;
+    return type.isString(str) ? utils.trim(str[0].toUpperCase() + str.slice(1).toLowerCase()) : "";
 }
 
 function toHeaderString(str) {
@@ -63,7 +93,7 @@ function parseResponseHeaders(responseHeaders) {
 
         if (key && value) {
             key = toHeaderString(key);
-            value = trim(value);
+            value = utils.trim(value);
 
             if (key === "Content-Length") {
                 value = +value;
@@ -78,14 +108,16 @@ function parseResponseHeaders(responseHeaders) {
 
 function XMLHttpRequest() {
     var xhr = new NativeXMLHttpRequest(),
-        data = {
-            requestId: uuid()
-        },
+        data = {},
         started = false;
 
     function onreadystatechange() {
         var statusCode = +xhr.status,
             readyState = +xhr.readyState;
+
+        if (!supportsEventListener) {
+            xhr.dispatchEvent("readystatechange", xhr);
+        }
 
         if (readyState === 1) {
             if (started === false) {
@@ -93,11 +125,11 @@ function XMLHttpRequest() {
                 started = true;
             }
         } else if (readyState === 4) {
-            if (!NATIVE_EVENT_TARGET) {
+            if (!supportsEventListener) {
                 if ((statusCode > 199 && statusCode < 301) || statusCode === 304) {
-                    triggerEvent(xhr, "load", xhr);
+                    xhr.dispatchEvent("load", xhr);
                 } else {
-                    triggerEvent(xhr, "error", xhr);
+                    xhr.dispatchEvent("error", xhr);
                 }
             }
 
@@ -111,11 +143,11 @@ function XMLHttpRequest() {
             data.end = time.stamp();
             data.delta = data.end - data.start;
 
-            request.post("http://localhost:3000/requests", data);
+            request.post(stats.url() + "/requests", data);
         }
     }
 
-    if (NATIVE_EVENT_TARGET) {
+    if (supportsEventListener) {
         xhr.addEventListener("readystatechange", onreadystatechange);
     } else {
         xhr.onreadystatechange = onreadystatechange;
@@ -124,46 +156,37 @@ function XMLHttpRequest() {
     return xhr;
 }
 
-if (!NATIVE_EVENT_TARGET) {
-    triggerEvent = function(xhr, name, data) {
-        var events = xhr.__events__ || (xhr.__events__ = {}),
-            eventList = events[name] || (events[name] = []),
-            i = -1,
-            length = eventList.length - 1,
-            event;
+global.XMLHttpRequest = XMLHttpRequest;
 
-        while (i++ < length) event.call(xhr, data);
-    }
 
-    NativeXMLHttpRequest.prototype.addEventListener = function(name, fn) {
-        var _this = this,
-            events = this.__events__ || (this.__events__ = {}),
-            eventList = events[name] || (events[name] = []);
+stats.set = function(apiKey, projectId) {
+    var url = "http://localhost:3000/"+ apiKey +"/"+ projectId;
 
-        eventList.push(fn);
+    stats.url = function(path) {
+        return url;
     };
 
-    NativeXMLHttpRequest.prototype.removeEventListener = function(name, fn) {
-        var _this = this,
-            events = this.__events__ || (this.__events__ = {}),
-            eventList = events[name] || (events[name] = []),
-            index = utils.indexOf(eventList, fn);
-
-        if (index !== -1) {
-            eventList.splice(index, 1);
-        }
-    };
-} else {
-    triggerEvent = utils.noop;
-}
-
-NativeXMLHttpRequest.prototype.nativeSetRequestHeader = NativeXMLHttpRequest.prototype.setRequestHeader;
-NativeXMLHttpRequest.prototype.setRequestHeader = function setRequestHeader(key, value) {
-
-    (this.__requestHeaders__ || (this.__requestHeaders__ = {}))[key] = value;
-
-    return this.nativeSetRequestHeader(key, value);
+    return stats;
 };
 
+stats.url = function() {
+    throw new Error("stats.url() call stats.set(apiKey, projectId) first");
+};
 
-global.XMLHttpRequest = XMLHttpRequest;
+stats.log = function(log) {
+
+    return request.post(stats.url() + "/logs", {
+        date: new Date(),
+        log: log
+    });
+};
+
+stats.error = function(error, url, line) {
+
+    return request.post(stats.url() + "/errors", {
+        date: new Date(),
+        error: type.isString(error) ? error : (error.stack || error.message || error +""),
+        url: type.isString(url) ? url : location.href,
+        line: type.isNumber((line = +line)) ? line : -1
+    });
+};
