@@ -1,0 +1,50 @@
+.btn{
+  cursor: pointer !important;
+  display: inline-block;
+  border: none;
+  padding: 8px 16px;
+
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+
+  -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0,0,0,0.2);
+
+  background: none;
+  color: @black;
+  &:hover{
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  &.blue{
+    background: @blue;
+    color: @white;
+    &:hover{
+      background: @light-blue;
+    }
+  }
+  &.red{
+    background: @red;
+    color: @white;
+    &:hover{
+      background: @light-red;
+    }
+  }
+  &.green{
+    background: @green;
+    color: @white;
+    &:hover{
+      background: @light-green;
+    }
+  }
+  &.orange{
+    background: @orange;
+    color: @white;
+    &:hover{
+      background: @light-orange;
+    }
+  }
+}

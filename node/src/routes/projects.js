@@ -1,26 +1,86 @@
 var url = require("url"),
     api = require("../api"),
-    router = require("./api_scope");
+    router = require("../router");
 
 
 var projects = router.scope("projects");
 
 
-function get(req, res) {
-    api.models.requests.get(function(err, data) {
+function index(req, res, next) {
+    api.models.Project.find({
+        where: {
+            userId: req.user.id
+        }
+    },  function(err, projects) {
         if (err) {
-            res.send(422, err);
+            res.json(422, err);
             return;
         }
 
-        res.json(data);
+        res.json(projects);
     });
 }
 
+function show(req, res, next) {
+    api.models.Project.findOne({
+        where: {
+            id: req.param("id"),
+            userId: req.user.id
+        }
+    },  function(err, project) {
+        if (err) {
+            res.json(422, err);
+            return;
+        }
 
-requests.route()
-    .get(get)
+        res.json(project);
+    });
+}
+
+function create(req, res, next) {
+    var data = {};
+
+    data.title = req.param("title");
+    data.description = req.param("description");
+    data.userId = req.user.id;
+
+    api.models.Project.create(data,  function(err, project) {
+        if (err) {
+            res.json(422, err);
+            return;
+        }
+
+        res.json(project);
+    });
+}
+
+projects.use(
+    function(req, res, next) {
+        var apiToken = req.getHeader("X-API-Token");
+
+        api.models.User.findOne({
+            where: {
+                apiToken: apiToken
+            }
+        }, function(err, user) {
+            if (err) {
+                res.json(422, err);
+                return;
+            }
+
+            req.user = user;
+            next();
+        });
+    }
+);
+
+
+projects.route()
+    .get(index)
     .post(create);
 
+projects.route("/:id")
+    .get(show);
 
-module.exports = requests;
+
+module.exports = projects;

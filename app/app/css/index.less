@@ -7,10 +7,28 @@
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+
+  outline: 0;
+  &:hover, &:active, &:focus{
+    outline: 0;
+  }
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+
+  cursor: default;
 }
 
 a {
+  text-decoration: none;
+  color: @blue;
   cursor: pointer;
+  &:hover{
+    color: @light-blue;
+  }
 }
 
 img{
@@ -21,5 +39,20 @@ img{
 .wrap{
   min-width: 320px;
   max-width: 1024px;
+  padding: 0 16px;
   margin: 0 auto;
 }
+
+.left{
+  float: left;
+}
+.right{
+  float: right;
+}
+
+@import "forms.less";
+@import "buttons.less";
+@import "header.less";
+@import "page.less";
+@import "user.less";
+@import "projects.less";

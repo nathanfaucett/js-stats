@@ -1,0 +1,28 @@
+form, .form {
+  input, textarea{
+    display: block;
+    padding: 8px;
+
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+
+    border: 1px solid rgba(0,0,0,0.2);
+    margin-bottom: 4px;
+    cursor: auto;
+
+    &:focus{
+      border-color: @light-blue;
+    }
+    &[type=submit]:focus{
+      border-color: rgba(0,0,0,0.2);
+    }
+  }
+  textarea{
+    resize: vertical;
+  }
+
+  .group *{
+    width: 100%;
+  }
+}

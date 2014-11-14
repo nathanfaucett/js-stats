@@ -1,17 +1,26 @@
 
-<div class="wrap">
+<div class="wrap page projects">
 
-  <h1><%= i18n("projects.header") %></h1>
+  <div class="header block">
 
+    <h1 class="grid-6"><%= i18n("projects.header") %></h1>
+
+    <div class="grid-6">
+      <a href="/projects/new" id="projects-new" class="btn blue right"><%= i18n("create") %> <%= i18n("projects.project") %></a>
+    </div>
+  </div>
 
   <% if (projects.length) { %>
-    <ul>
+    <ul class="list">
       <% each(projects, function(project) { %>
-        <li><%= project.title %></li>
+        <li>
+          <h3><%= project.title %></h3>
+          <p><%= project.description %></p>
+        </li>
       <% }); %>
     </ul>
   <% } else { %>
-    <p>asdfasdf asdf</p>
+    <p><%= i18n("projects.no_projects") %></p>
   <% } %>
 
 </div>

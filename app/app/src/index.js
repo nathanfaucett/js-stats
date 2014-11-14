@@ -22,6 +22,9 @@ router.use(
     function(ctx, next) {
         var apiToken = cookies.get("apiToken");
 
+        ctx.user = user;
+        ctx.locale = user && user.locale || "en";
+
         function header() {
             ctx.render("#header", "src/application/templates/header.ejs", null, next);
         }
@@ -33,9 +36,13 @@ router.use(
                         user.create(response.data);
                         header();
                     },
-                    function() {
-                        user.destroy();
-                        next();
+                    function(response) {
+                        if (response.statusCode === 0) {
+                            alert("Server Down");
+                        } else {
+                            user.destroy();
+                            page.go("/sign_in");
+                        }
                     }
                 );
             } else {
@@ -53,15 +60,12 @@ require("./user/index");
 
 router.use(
     function(ctx, next) {
-        ctx.render("#content", "src/app/templates/404.ejs", null, next);
+        ctx.render("#content", "src/application/templates/404.ejs", null, next);
     },
     function(err, ctx, next) {
         throw err;
     }
 );
-
-
-console.log(router);
 
 
 app.init();

@@ -65,6 +65,8 @@ module.exports = function(grunt) {
                             "index.css",
                             "index.js",
                             "img/**/*",
+                            "src/**/*.ejs",
+                            "src/**/*.html",
                             "src/**/*.png",
                             "src/**/*.jpeg",
                             "src/**/*.jpg"
@@ -187,6 +189,7 @@ module.exports = function(grunt) {
             },
             ejs: {
                 files: [
+                    "app/**/*.ejs",
                     "app/index.ejs"
                 ],
                 tasks: ["ejs:index_development"],

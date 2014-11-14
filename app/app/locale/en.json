@@ -1,0 +1,28 @@
+{
+  "edit": "Edit",
+  "create": "Create",
+  "delete": "Delete",
+  "nav": {
+    "menu": {
+      "home": "Home",
+      "projects": "Projects"
+    }
+  },
+  "404": {
+    "message": "404 - Not Found"
+  },
+  "user": {
+    "sign_in": "Sign in",
+    "sign_up": "Sign up",
+    "sign_out": "Sign out",
+    "already_a_user": "Already a user",
+    "not_a_user": "Not a user"
+  },
+  "projects": {
+    "header": "Projects",
+    "project": "Project",
+    "new": "Create new Project",
+    "description": "Description",
+    "no_projects": "No projects created yet."
+  }
+}

@@ -9,6 +9,7 @@ request.defaults.headers["Content-Type"] = "application/json";
 
 
 var stats = module.exports,
+    hostname = "http://api.stats.com:3000",
 
     NativeXMLHttpRequest = (
         global.XMLHttpRequest ||
@@ -111,12 +112,12 @@ function XMLHttpRequest() {
         data = {},
         started = false;
 
-    function onreadystatechange() {
+    function onreadystatechange(e) {
         var statusCode = +xhr.status,
             readyState = +xhr.readyState;
 
         if (!supportsEventListener) {
-            xhr.dispatchEvent("readystatechange", xhr);
+            xhr.dispatchEvent("readystatechange", e);
         }
 
         if (readyState === 1) {
@@ -127,9 +128,9 @@ function XMLHttpRequest() {
         } else if (readyState === 4) {
             if (!supportsEventListener) {
                 if ((statusCode > 199 && statusCode < 301) || statusCode === 304) {
-                    xhr.dispatchEvent("load", xhr);
+                    xhr.dispatchEvent("load", e);
                 } else {
-                    xhr.dispatchEvent("error", xhr);
+                    xhr.dispatchEvent("error", e);
                 }
             }
 
@@ -143,7 +144,9 @@ function XMLHttpRequest() {
             data.end = time.stamp();
             data.delta = data.end - data.start;
 
-            request.post(stats.url() + "/requests", data);
+            data.env = stats.env();
+
+            request.post(stats.url() +"/requests", data);
         }
     }
 
@@ -159,24 +162,37 @@ function XMLHttpRequest() {
 global.XMLHttpRequest = XMLHttpRequest;
 
 
-stats.set = function(apiKey, projectId) {
-    var url = "http://localhost:3000/"+ apiKey +"/"+ projectId;
+stats.set = function(apiKey, projectId, env) {
+    var url = hostname +"/projects/"+ projectId;
 
-    stats.url = function(path) {
+    env || (env = "production");
+
+    stats.url = function() {
         return url;
     };
+
+    stats.env = function() {
+        return env;
+    };
+
+    request.defaults.headers["X-API-Token"] = apiKey;
 
     return stats;
 };
 
 stats.url = function() {
-    throw new Error("stats.url() call stats.set(apiKey, projectId) first");
+    throw new Error("stats.url() call stats.set(apiKey, projectId, env) first");
+};
+
+stats.env = function() {
+    throw new Error("stats.env() call stats.set(apiKey, projectId, env) first");
 };
 
 stats.log = function(log) {
 
     return request.post(stats.url() + "/logs", {
         date: new Date(),
+        env: stats.env(),
         log: log
     });
 };
@@ -185,6 +201,7 @@ stats.error = function(error, url, line) {
 
     return request.post(stats.url() + "/errors", {
         date: new Date(),
+        env: stats.env(),
         error: type.isString(error) ? error : (error.stack || error.message || error +""),
         url: type.isString(url) ? url : location.href,
         line: type.isNumber((line = +line)) ? line : -1

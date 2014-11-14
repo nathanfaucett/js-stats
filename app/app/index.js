@@ -1,4 +1,4 @@
-// Compiled with Require.js on Thu Nov 13 2014 08:53:23 GMT-0600 (CST)
+// Compiled with Require.js on Fri Nov 14 2014 14:32:37 GMT-0600 (CST)
 
 (function(main, modules, paths, Buffer, process, __require__, global) {
     var isCommonJS = typeof(module) !== "undefined" && module.exports,
@@ -3798,8 +3798,8 @@ function request(options) {
 
     function oncomplete() {
         var statusCode = +xhr.status,
-            response = {},
-            responseText = xhr.responseText;
+            responseText = xhr.responseText,
+            response = {};
 
         response.url = xhr.responseURL || options.url;
         response.method = options.method;
@@ -3819,6 +3819,7 @@ function request(options) {
                     try {
                         response.data = JSON.parse(responseText);
                     } catch (e) {
+                        response.data = e;
                         onerror(response);
                         return;
                     }
@@ -4002,6 +4003,7 @@ function request(options) {
                         try {
                             response.data = JSON.parse(responseText);
                         } catch (e) {
+                            response.data = e;
                             onerror(response);
                             return;
                         }
@@ -4107,7 +4109,7 @@ user.create = function(data) {
     user.apiToken = data.apiToken;
 
     cookies.set("apiToken", data.apiToken);
-    request.defaults.headers["X-Stats-Token"] = data.apiToken;
+    request.defaults.headers["X-API-Token"] = data.apiToken;
 };
 
 user.destroy = function() {
@@ -4116,7 +4118,7 @@ user.destroy = function() {
     user.apiToken = null;
 
     cookies.remove("apiToken");
-    delete request.defaults.headers["X-Stats-Token"];
+    delete request.defaults.headers["X-API-Token"];
 };
 
 
@@ -14226,36 +14228,59 @@ module.exports = render;
 }, "./render.js", "."],
 [function(__require__, require, exports, __filename, __dirname, module, process, Buffer, global) {
 
-var router = require("./router.js");
+var PolyPromise = require("promise"),
+    request = require("request"),
+    router = require("./router.js");
 
 
-var translations = {
-    en: {
-        projects: {
-            header: "Projects"
-        }
+var translations = {};
+
+
+function loadTranslations(locale, callback) {
+    var translation = translations[locale];
+
+    if (!translation) {
+        request.get("locale/" + locale + ".json").then(
+            function(response) {
+                translation = translations[locale] = response.data;
+                callback(undefined, translation);
+            },
+            function(response) {
+                callback(new Error(response.data));
+            }
+        );
+    } else {
+        callback(undefined, translation);
     }
-};
-
+}
 
 function i18n(ctx, next) {
+    var locale = ctx.locale || "en";
 
-    function i18n(str, locale) {
-        var strs = str.split("."),
-            value = translations[(locale || "en")][strs[0]],
-            length = strs.length - 1,
-            i = 0;
-
-        while (i++ < length) {
-            value = value[strs[i]];
+    loadTranslations(locale, function(err, translations) {
+        if (err) {
+            next(err);
+            return;
         }
 
-        return value || str;
-    }
+        function translate(str) {
+            var strs = str.split("."),
+                value = translations[strs[0]],
+                length = strs.length - 1,
+                i = 0;
 
-    ctx.i18n = ctx.locals.i18n = i18n;
+            while (value && i++ < length) {
+                value = value[strs[i]];
+            }
 
-    next();
+            return value || str;
+        }
+
+        global.i18n = translate;
+        ctx.i18n = ctx.locals.i18n = translate;
+
+        next();
+    });
 }
 
 
@@ -14299,22 +14324,71 @@ router.route("/sign_out",
 }, "./application/index.js", "./application"],
 [function(__require__, require, exports, __filename, __dirname, module, process, Buffer, global) {
 
-var utils = require("utils"),
+var $ = require("jquery"),
+    page = require("page"),
     request = require("request"),
-    user = require("./user/user.js"),
+    router = require("./router.js"),
+    config = require("./config.js");
+
+
+router.route("/projects/new",
+    function(ctx, next) {
+        ctx.render("#content", "src/projects/templates/new.ejs", null, function(err) {
+            next(err);
+        });
+    },
+    function(ctx, next) {
+        $form = $("#form");
+
+        $form.find("#submit").on("click", function(e) {
+            var title = $form.find("#title").val(),
+                description = $form.find("#description").val();
+
+            request.post(config.url + "/projects", {
+                title: title,
+                description: description
+            }).then(
+                function(response) {
+                    page.go("/projects");
+                },
+                function(response) {
+                    throw new Error(response.data);
+                }
+            );
+
+            e.preventDefault();
+        });
+    }
+);
+
+
+}, "./projects/create.js", "./projects"],
+[function(__require__, require, exports, __filename, __dirname, module, process, Buffer, global) {
+
+var request = require("request"),
     router = require("./router.js"),
     config = require("./config.js");
 
 
 router.route("/projects",
     function(ctx, next) {
-        ctx.render("#content", "src/projects/templates/index.ejs", {
-            projects: []
-        }, function(err) {
-            if (err) next(err);
-        });
+        request.get(config.url +"/projects").then(
+            function(response) {
+                ctx.render("#content", "src/projects/templates/index.ejs", {
+                    projects: response.data
+                }, function(err) {
+                    if (err) next(err);
+                });
+            },
+            function(response) {
+                next(new Error(response.statusCode));
+            }
+        );
     }
 );
+
+
+require("./projects/create.js");
 
 
 }, "./projects/index.js", "./projects"],
@@ -14408,6 +14482,7 @@ router.route("/sign_up",
             }).then(
                 function(response) {
                     user.create(response.data);
+                    page.go("/");
                 },
                 function(response) {
                     console.log(response);
@@ -14456,6 +14531,9 @@ router.use(
     function(ctx, next) {
         var apiToken = cookies.get("apiToken");
 
+        ctx.user = user;
+        ctx.locale = user && user.locale || "en";
+
         function header() {
             ctx.render("#header", "src/application/templates/header.ejs", null, next);
         }
@@ -14467,9 +14545,13 @@ router.use(
                         user.create(response.data);
                         header();
                     },
-                    function() {
-                        user.destroy();
-                        next();
+                    function(response) {
+                        if (response.statusCode === 0) {
+                            alert("Server Down");
+                        } else {
+                            user.destroy();
+                            page.go("/sign_in");
+                        }
                     }
                 );
             } else {
@@ -14487,7 +14569,7 @@ require("./user/index.js");
 
 router.use(
     function(ctx, next) {
-        ctx.render("#content", "src/app/templates/404.ejs", null, next);
+        ctx.render("#content", "src/application/templates/404.ejs", null, next);
     },
     function(err, ctx, next) {
         throw err;
@@ -14495,14 +14577,11 @@ router.use(
 );
 
 
-console.log(router);
-
-
 app.init();
 
 
 }, "./index.js", "."]],
-    {"type":0,"punycode":1,"utils":2,"qs":3,"urls":4,"path_utils":5,"url_path":6,"event_emitter":7,"page":8,"cookies":9,"methods":10,"each":11,"../../node_modules/request/src/defaults.js":12,"promise":13,"../../node_modules/request/src/request_browser.js":14,"../../node_modules/request/src/request_node.js":15,"request":16,"./user/user.js":17,"../../node_modules/layers_browser/src/helpers.js":18,"../../node_modules/layers_browser/src/layer.js":19,"../../node_modules/layers_browser/src/route.js":20,"../../node_modules/layers_browser/src/router.js":21,"layers_browser":22,"./router.js":23,"./config.js":24,"./app.js":25,"jquery":26,"template":27,"./render.js":28,"./i18n.js":29,"./application/index.js":30,"./projects/index.js":31,"./user/sign_in.js":32,"./user/sign_up.js":33,"./user/index.js":34,"./index.js":35},
+    {"type":0,"punycode":1,"utils":2,"qs":3,"urls":4,"path_utils":5,"url_path":6,"event_emitter":7,"page":8,"cookies":9,"methods":10,"each":11,"../../node_modules/request/src/defaults.js":12,"promise":13,"../../node_modules/request/src/request_browser.js":14,"../../node_modules/request/src/request_node.js":15,"request":16,"./user/user.js":17,"../../node_modules/layers_browser/src/helpers.js":18,"../../node_modules/layers_browser/src/layer.js":19,"../../node_modules/layers_browser/src/route.js":20,"../../node_modules/layers_browser/src/router.js":21,"layers_browser":22,"./router.js":23,"./config.js":24,"./app.js":25,"jquery":26,"template":27,"./render.js":28,"./i18n.js":29,"./application/index.js":30,"./projects/create.js":31,"./projects/index.js":32,"./user/sign_in.js":33,"./user/sign_up.js":34,"./user/index.js":35,"./index.js":36},
     (typeof(Buffer) !== "undefined" ? Buffer : (function() {
     var toString = Object.prototype.toString,
         isArray = Array.isArray || (function isArray(obj) {

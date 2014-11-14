@@ -17,7 +17,9 @@ var collection = orm({
 });
 
 collection.bindModels(
-    require("./models/user")
+    require("./models/user"),
+    require("./models/project"),
+    require("./models/request")
 );
 
 

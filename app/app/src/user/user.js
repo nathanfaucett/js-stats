@@ -15,7 +15,7 @@ user.create = function(data) {
     user.apiToken = data.apiToken;
 
     cookies.set("apiToken", data.apiToken);
-    request.defaults.headers["X-Stats-Token"] = data.apiToken;
+    request.defaults.headers["X-API-Token"] = data.apiToken;
 };
 
 user.destroy = function() {
@@ -24,5 +24,5 @@ user.destroy = function() {
     user.apiToken = null;
 
     cookies.remove("apiToken");
-    delete request.defaults.headers["X-Stats-Token"];
+    delete request.defaults.headers["X-API-Token"];
 };

@@ -35,6 +35,7 @@ router.route("/sign_up",
             }).then(
                 function(response) {
                     user.create(response.data);
+                    page.go("/");
                 },
                 function(response) {
                     console.log(response);

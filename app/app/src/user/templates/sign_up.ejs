@@ -1,15 +1,25 @@
 
 <div class="sign up wrap">
 
-  <a href="/sign_in">Sign in</a>
+  <h1><%= i18n("user.sign_up") %></h1>
 
-  <form id="form">
+  <p><%= i18n("user.already_a_user") %> <a href="/sign_in"><%= i18n("user.sign_in") %></a></p>
 
-    <input id="email" type="email" placeholder="Email"/>
-    <input id="password" type="password" placeholder="Password"/>
-    <input id="confirm-password" type="password" placeholder="Confirm Password"/>
+  <form id="form" class="form">
 
-    <input id="submit" type="submit" value="Sign up"/>
+    <div class="group">
+      <input id="email" type="email" placeholder="Email"/>
+    </div>
+    <div class="group">
+      <input id="password" type="password" placeholder="Password"/>
+    </div>
+    <div class="group">
+      <input id="confirm-password" type="password" placeholder="Confirm Password"/>
+    </div>
+
+    <div class="group">
+      <input id="submit" class="btn blue" type="submit" value="Sign up"/>
+    </div>
 
   </form>
 

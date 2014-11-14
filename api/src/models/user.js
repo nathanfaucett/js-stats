@@ -15,9 +15,16 @@ var User = new orm.define({
     name: "User",
 
     schema: {
-        confirmed: "boolean",
         confirmToken: "string",
         apiToken: "string",
+        confirmed: {
+            type: "boolean",
+            defaults: false
+        },
+        locale: {
+            type: "string",
+            defaults: "en"
+        },
         email: {
             type: "string",
             unique: true
@@ -62,14 +69,14 @@ User.on("init", function(next) {
     this.on("beforeCreate", encryptPassword);
     this.on("beforeSave", encryptPassword);
 
-    function createApiToken(model, next) {
+    function defaults(model, next) {
 
         if (model.apiToken == null) model.apiToken = uid(64);
         next();
     }
 
-    this.on("beforeCreate", createApiToken);
-    this.on("beforeSave", createApiToken);
+    this.on("beforeCreate", defaults);
+    this.on("beforeSave", defaults);
 
     next();
 });
