@@ -1,15 +1,11 @@
 var utils = require("utils"),
     type = require("type"),
     each = require("each"),
-    time = require("time"),
-    request = require("request");
-
-
-request.defaults.headers["Content-Type"] = "application/json";
+    time = require("time");
 
 
 var stats = module.exports,
-    hostname = "http://api.stats.com:3000",
+    hostname = "http://stats.com:3000",
 
     NativeXMLHttpRequest = (
         global.XMLHttpRequest ||
@@ -107,6 +103,24 @@ function parseResponseHeaders(responseHeaders) {
     return headers;
 }
 
+function jsonRequest(method, url, json) {
+    var xhr = new NativeXMLHttpRequest();
+
+    xhr.open(method, stats.url() + url, true);
+
+    if (xhr.overrideMimeType) {
+        xhr.overrideMimeType("application/json");
+    }
+    if (xhr.setRequestHeader) {
+        xhr.setRequestHeader("X-API-Token", stats.apiToken());
+
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    }
+
+    xhr.send(JSON.stringify(json));
+}
+
 function XMLHttpRequest() {
     var xhr = new NativeXMLHttpRequest(),
         data = {},
@@ -146,7 +160,7 @@ function XMLHttpRequest() {
 
             data.env = stats.env();
 
-            request.post(stats.url() +"/requests", data);
+            jsonRequest("POST", "/requests", data);
         }
     }
 
@@ -162,7 +176,7 @@ function XMLHttpRequest() {
 global.XMLHttpRequest = XMLHttpRequest;
 
 
-stats.set = function(apiKey, projectId, env) {
+stats.set = function(apiToken, projectId, env) {
     var url = hostname +"/projects/"+ projectId;
 
     env || (env = "production");
@@ -175,22 +189,28 @@ stats.set = function(apiKey, projectId, env) {
         return env;
     };
 
-    request.defaults.headers["X-API-Token"] = apiKey;
+    stats.apiToken = function() {
+        return apiToken;
+    };
 
     return stats;
 };
 
 stats.url = function() {
-    throw new Error("stats.url() call stats.set(apiKey, projectId, env) first");
+    throw new Error("stats.url() call stats.set(apiToken, projectId, env) first");
 };
 
 stats.env = function() {
-    throw new Error("stats.env() call stats.set(apiKey, projectId, env) first");
+    throw new Error("stats.env() call stats.set(apiToken, projectId, env) first");
+};
+
+stats.apiToken = function() {
+    throw new Error("stats.apiToken() call stats.set(apiToken, projectId, env) first");
 };
 
 stats.log = function(log) {
 
-    return request.post(stats.url() + "/logs", {
+    jsonRequest("POST", "/logs", {
         date: new Date(),
         env: stats.env(),
         log: log
@@ -199,7 +219,7 @@ stats.log = function(log) {
 
 stats.error = function(error, url, line) {
 
-    return request.post(stats.url() + "/errors", {
+    jsonRequest("POST", "/errors", {
         date: new Date(),
         env: stats.env(),
         error: type.isString(error) ? error : (error.stack || error.message || error +""),

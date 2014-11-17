@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "each": "nathanfaucett/each",
-    "request": "nathanfaucett/request",
     "time": "nathanfaucett/time",
     "type": "nathanfaucett/type",
     "utils": "nathanfaucett/utils"

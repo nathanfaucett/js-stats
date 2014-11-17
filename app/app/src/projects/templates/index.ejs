@@ -1,5 +1,5 @@
 
-<div class="wrap page projects">
+<div class="wrap page project index">
 
   <div class="header block">
 
@@ -13,9 +13,17 @@
   <% if (projects.length) { %>
     <ul class="list">
       <% each(projects, function(project) { %>
-        <li>
-          <h3><%= project.title %></h3>
-          <p><%= project.description %></p>
+        <li class="item block">
+
+          <div class="block">
+            <h3 class="title left"><%= project.title %></h3>
+            <div class="btns right">
+              <a href="/projects/<%= project.id %>" class="project-edit btn blue"><%= i18n("projects.view") %></a>
+              <a id="<%= project.id %>" class="project-delete btn red"><%= i18n("delete") %></a>
+            </div>
+          </div>
+
+          <p class="description"><%= project.description %></p>
         </li>
       <% }); %>
     </ul>

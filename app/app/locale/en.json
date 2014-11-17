@@ -11,6 +11,13 @@
   "404": {
     "message": "404 - Not Found"
   },
+  "forms": {
+    "placeholder": {
+      "email": "Email",
+      "password": "Password",
+      "confirm_password": "Confirm Password"
+    }
+  },
   "user": {
     "sign_in": "Sign in",
     "sign_up": "Sign up",
@@ -21,6 +28,9 @@
   "projects": {
     "header": "Projects",
     "project": "Project",
+    "view": "View",
+    "project_id": "Project id",
+    "api_token": "API Token",
     "new": "Create new Project",
     "description": "Description",
     "no_projects": "No projects created yet."

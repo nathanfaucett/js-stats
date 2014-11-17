@@ -1,5 +1,4 @@
-var url = require("url"),
-    api = require("../api"),
+var api = require("../api"),
     router = require("../router");
 
 
@@ -54,24 +53,24 @@ function create(req, res, next) {
     });
 }
 
+function destroy(req, res, next) {
+    api.models.Project.destroy({
+        where: {
+            id: req.param("id"),
+            userId: req.user.id
+        }
+    },  function(err, project) {
+        if (err) {
+            res.json(422, err);
+            return;
+        }
+
+        res.json(project);
+    });
+}
+
 projects.use(
-    function(req, res, next) {
-        var apiToken = req.getHeader("X-API-Token");
-
-        api.models.User.findOne({
-            where: {
-                apiToken: apiToken
-            }
-        }, function(err, user) {
-            if (err) {
-                res.json(422, err);
-                return;
-            }
-
-            req.user = user;
-            next();
-        });
-    }
+    require("../policies/api_token")
 );
 
 
@@ -79,8 +78,13 @@ projects.route()
     .get(index)
     .post(create);
 
-projects.route("/:id")
-    .get(show);
+projects.route("/:id[0-9]")
+    .get(show)
+    .delete(destroy);
 
+
+projects.use("/:projectId[0-9]",
+    require("../policies/project")
+);
 
 module.exports = projects;

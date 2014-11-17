@@ -31,7 +31,9 @@
   "dependencies": {
     "cookies": "nathanfaucett/cookies",
     "each": "nathanfaucett/each",
+    "url_path": "nathanfaucett/url_path",
     "template": "nathanfaucett/template",
+    "qs": "nathanfaucett/qs",
     "jquery": "^2.1.1",
     "promise": "nathanfaucett/promise",
     "request": "nathanfaucett/request",

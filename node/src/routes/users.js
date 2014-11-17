@@ -120,7 +120,7 @@ users.route("/:id[0-9]")
 users.route("/token/:apiToken")
     .get(findByToken);
 
-users.route("/:id/confirm")
+users.route("/:id[0-9]/confirm")
     .get(createConfirmToken);
 
 users.route("/confirm")

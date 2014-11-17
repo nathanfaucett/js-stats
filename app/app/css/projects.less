@@ -1,9 +1,26 @@
-.projects{
-  .list{
-    padding: 0;
-    margin: 0;
-    li{
-      list-style: none;
+.project{
+  &.index{
+    .list{
+      padding: 0;
+      margin: 0;
+      .item{
+        list-style: none;
+
+        .title{
+          margin: 0;
+        }
+        .description{
+          margin: 0;
+        }
+      }
     }
+  }
+
+  &.new{
+    max-width: 768px;
+  }
+
+  &.show{
+
   }
 }

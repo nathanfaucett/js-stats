@@ -34,7 +34,8 @@ var User = new orm.define({
 });
 
 User.accessible(
-    "email"
+    "email",
+    "locale"
 );
 
 User.validates("email")
@@ -86,6 +87,7 @@ User.prototype.toJSON = function() {
 
     json.id = this.id;
     json.email = this.email;
+    json.confirmed = this.confirmed;
     json.apiToken = this.apiToken;
     json.createdAt = this.createdAt;
     json.updatedAt = this.updatedAt;

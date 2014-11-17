@@ -1,10 +1,14 @@
 var page = require("page"),
+    //stats = require("../../../browser/src/index"),
     cookies = require("cookies"),
     request = require("request"),
     user = require("./user/user"),
     router = require("./router"),
     config = require("./config"),
     app = require("./app");
+
+
+//stats.set("MZhLXvdaS2Cjf4OuNNtidkg359jeuJ1URKit7bV47DRNMHGJkIE47sEC6bMiexNu", 1, config.env);
 
 
 router.use(

@@ -15,7 +15,7 @@
 
     <title>Stats</title>
 
-    <link rel="stylesheet" href="index.css"/>
+    <link href="index.css" rel="stylesheet"/>
 
   </head>
 
@@ -29,7 +29,7 @@
     </div>
 
     <% if (development) { %>
-    <script src="//localhost:<%= liveReloadPort %>/livereload.js"></script>
+    <script type="application/javascript" src="//localhost:<%= liveReloadPort %>/livereload.js"></script>
     <% } %>
 
     <script type="application/javascript" src="index.js"></script>

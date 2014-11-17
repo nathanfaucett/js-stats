@@ -409,6 +409,14 @@ th {
 .block .pull-1 {
   margin-left: -8.33325% !important;
 }
+.selectable {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  -o-user-select: auto;
+  user-select: auto;
+  cursor: text;
+}
 * {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -548,10 +556,19 @@ form .group *,
 .sign {
   width: 320px;
 }
-.projects .list {
+.project.index .list {
   padding: 0;
   margin: 0;
 }
-.projects .list li {
+.project.index .list .item {
   list-style: none;
+}
+.project.index .list .item .title {
+  margin: 0;
+}
+.project.index .list .item .description {
+  margin: 0;
+}
+.project.new {
+  max-width: 768px;
 }

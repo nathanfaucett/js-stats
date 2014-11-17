@@ -46,7 +46,6 @@ function i18n(ctx, next) {
             return value || str;
         }
 
-        global.i18n = translate;
         ctx.i18n = ctx.locals.i18n = translate;
 
         next();

@@ -1,6 +1,8 @@
 var utils = require("utils"),
     each = require("each"),
     $ = require("jquery"),
+    page = require("page"),
+    urlPath = require("url_path"),
     PolyPromise = require("promise"),
     template = require("template"),
     router = require("./router"),
@@ -19,7 +21,7 @@ function templateCache(url, settings) {
         defer = PolyPromise.defer();
 
     if (!cache[url]) {
-        request.get(url, null, requestOptions).then(
+        request.get(urlPath.join(page.base(), url), null, requestOptions).then(
             function(response) {
                 cache[url] = template(response.data, null, settings);
                 defer.resolve(cache[url]);
@@ -45,6 +47,7 @@ function render(ctx, next) {
 
     ctx.locals = locals;
 
+    ctx.templateCache = templateCache;
     ctx.render = function render(selector, url, locals, callback) {
         locals = utils.mixin(locals || {}, ctx.locals);
 

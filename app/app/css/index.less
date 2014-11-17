@@ -3,6 +3,28 @@
 @import "lib/normalize.less";
 @import "lib/grid.less";
 
+.select-none() {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+.select() {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  -o-user-select: auto;
+  user-select: auto;
+  cursor: text;
+}
+
+.selectable {
+  .select();
+}
+
 * {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -13,13 +35,7 @@
     outline: 0;
   }
 
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-
-  cursor: default;
+  .select-none();
 }
 
 a {
